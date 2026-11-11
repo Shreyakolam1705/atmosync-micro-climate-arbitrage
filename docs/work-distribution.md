@@ -43,3 +43,4 @@ To be added after the Mid Review. Week 3: spoilage arbitrage models and at-risk 
 | Date | Change | Updated by |
 |---|---|---|
 | 11 Nov 2026 | First version: roles and Weeks 1 and 2 | Shreya |
+| 11 Nov 2026 | Mid Review date updated to 27 to 30 Nov, Final Review date pending | Shreya |
