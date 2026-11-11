@@ -219,14 +219,4 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-.env
-*.env
-profiles.yml
-secrets/
-
-# AtmoSync local files
 data/generated/
-.env
-*.env
-venv/
-.venv/
