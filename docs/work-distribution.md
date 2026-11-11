@@ -3,8 +3,8 @@
 - **Project:** AtmoSync: Micro-Climate Arbitrage Analytics
 - **Team Lead:** Shreya Kolam
 - **Project window:** 10 Nov 2026 to 10 Dec 2026
-- **Mid Review:** 20 to 27 Nov 2026
-- **Final Review:** 5 to 10 Dec 2026
+- **Mid Review:** 27 to 30 Nov 2026 (as informed by mentor, to be confirmed)
+- **Final Review:** Date to be confirmed
 
 ## Team and roles
 | Member | Role | Branch | Main ownership |
