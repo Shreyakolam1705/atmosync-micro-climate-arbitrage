@@ -1,87 +1,40 @@
 
 import json
-import random
 import time
-from datetime import datetime, timezone
 from kafka import KafkaProducer
+from simulator import generate_readings
 
-# Connect Python to local Kafka
+# Connect to local Kafka
 producer = KafkaProducer(
     bootstrap_servers="127.0.0.1:9092",
     value_serializer=lambda value: json.dumps(value).encode("utf-8")
 )
 
-# Generate 10 container IDs
-containers = {
-    f"CNT-{i:03d}": random.uniform(5.0, 7.0)
-    for i in range(1, 11)
-}
-
-# Starting GPS coordinates
-START_LATITUDE = 12.9716
-START_LONGITUDE = 77.5946
-
-# Give each container a different starting position
-container_positions = {
-    container_id: {
-        "lat": START_LATITUDE + index * 0.0005,
-        "lon": START_LONGITUDE + index * 0.0005
-    }
-    for index, container_id in enumerate(containers)
-}
-
-# Simulate one faulty container
-faulty_container = "CNT-002"
-
-# Eastward movement per cycle
-MOVEMENT_STEP = 0.0001
+TOPIC = "container-telemetry"
 
 print("AtmoSync Kafka Producer started!")
-print("Sending 10 avocado container readings...\n")
+print(f"Sending readings to Kafka topic: {TOPIC}")
+print("Tracking 10 containers. Press Ctrl+C to stop.\n")
 
 try:
     while True:
+        # Generate readings using the shared simulator
+        readings = generate_readings()
 
-        for container_id in containers:
+        # Send each reading to Kafka
+        for reading in readings:
+            future = producer.send(TOPIC, value=reading)
 
-            # Simulate temperature changes
-            if container_id == faulty_container:
-                containers[container_id] += 0.15
-            else:
-                containers[container_id] += random.uniform(-0.2, 0.2)
+            # Wait for Kafka acknowledgement
+            future.get(timeout=10)
 
-            position = container_positions[container_id]
-
-            # Generate UTC timestamp
-            timestamp = (
-                datetime.now(timezone.utc)
-                .isoformat(timespec="seconds")
-                .replace("+00:00", "Z")
-            )
-
-            # Create message according to official schema
-            reading = {
-                "container_id": container_id,
-                "commodity": "avocado",
-                "timestamp": timestamp,
-                "temperature": round(containers[container_id], 2),
-                "humidity": round(random.uniform(80, 95), 2),
-                "vibration": round(random.uniform(0.1, 2.0), 2),
-                "lat": round(position["lat"], 6),
-                "lon": round(position["lon"], 6)
-            }
-
-            # Send reading to Kafka
-            producer.send("container-telemetry", value=reading)
-
-            print("Sent:", reading)
-
-            # Move container eastward
-            position["lon"] += MOVEMENT_STEP
+            print("Sent to Kafka:", json.dumps(reading))
 
         producer.flush()
 
-        time.sleep(2)
+        print("Batch complete: 10 readings sent.\n")
+
+        time.sleep(1)
 
 except KeyboardInterrupt:
     print("\nAtmoSync Kafka Producer stopped.")
