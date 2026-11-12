@@ -15,103 +15,77 @@ OUTPUT_FILE = (
 
 OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 
-# Initialize 10 containers
-containers = {
-    f"CNT-{i:03d}": {
-        "temperature": random.uniform(5.0, 7.0),
-        "humidity": random.uniform(85.0, 90.0)
-    }
-    for i in range(1, 11)
-}
+# One container only
+container_id = "CNT-001"
+commodity = "avocado"
 
-# Starting GPS coordinates
-START_LATITUDE = 12.9716
-START_LONGITUDE = 77.5946
+# Initial sensor values
+temperature = random.uniform(5.0, 7.0)
+humidity = random.uniform(85.0, 90.0)
 
-container_positions = {
-    container_id: {
-        "lat": START_LATITUDE + index * 0.0005,
-        "lon": START_LONGITUDE + index * 0.0005
-    }
-    for index, container_id in enumerate(containers)
-}
+# Initial GPS coordinates
+latitude = 12.9716
+longitude = 77.5946
 
-# Simulate a temperature fault
-FAULTY_CONTAINER = "CNT-002"
+# Simulated movement per reading
 MOVEMENT_STEP = 0.0001
 
 
-def generate_readings():
-    """Generate one reading for each container."""
+def generate_reading():
+    """Generate one random-walk reading for CNT-001."""
 
-    readings = []
+    global temperature, humidity, latitude, longitude
 
+    # Random-walk temperature and humidity
+    temperature += random.uniform(-0.01, 0.1)
+    humidity += random.uniform(-0.5, 0.5)
+
+    # Keep sensor values within simulation limits
+    temperature = max(4.0, min(12.0, temperature))
+    humidity = max(70.0, min(95.0, humidity))
+
+    # Generate UTC timestamp
     timestamp = (
         datetime.now(timezone.utc)
         .isoformat(timespec="seconds")
         .replace("+00:00", "Z")
     )
 
-    for container_id, sensor in containers.items():
+    # Create reading matching docs/data-schema.md
+    reading = {
+        "container_id": container_id,
+        "commodity": commodity,
+        "timestamp": timestamp,
+        "temperature": round(temperature, 2),
+        "humidity": round(humidity, 2),
+        "vibration": round(random.uniform(0.1, 0.3), 2),
+        "lat": round(latitude, 6),
+        "lon": round(longitude, 6)
+    }
 
-        if container_id == FAULTY_CONTAINER:
-            # Gradual temperature increase
-            sensor["temperature"] += 0.15
+    # Simulate container movement
+    latitude += MOVEMENT_STEP
+    longitude += MOVEMENT_STEP
 
-            # Simplified relative humidity decrease
-            sensor["humidity"] *= 0.9895
-
-        else:
-            # Normal random-walk changes
-            sensor["temperature"] += random.uniform(-0.1, 0.1)
-            sensor["humidity"] += random.uniform(-0.5, 0.5)
-
-        # Keep values within simulation limits
-        sensor["temperature"] = max(
-            4.0, min(12.0, sensor["temperature"])
-        )
-
-        sensor["humidity"] = max(
-            70.0, min(95.0, sensor["humidity"])
-        )
-
-        position = container_positions[container_id]
-
-        reading = {
-            "container_id": container_id,
-            "commodity": "avocado",
-            "timestamp": timestamp,
-            "temperature": round(sensor["temperature"], 2),
-            "humidity": round(sensor["humidity"], 2),
-            "vibration": round(random.uniform(0.1, 0.3), 2),
-            "lat": round(position["lat"], 6),
-            "lon": round(position["lon"], 6)
-        }
-
-        readings.append(reading)
-
-        # Simulate eastward movement
-        position["lon"] += MOVEMENT_STEP
-
-    # Save readings to JSON Lines file
+    # Save reading in JSON Lines format
     with OUTPUT_FILE.open("a", encoding="utf-8") as file:
-        for reading in readings:
-            file.write(json.dumps(reading) + "\n")
+        file.write(json.dumps(reading) + "\n")
 
-    return readings
+    return reading
 
 
 if __name__ == "__main__":
     print("AtmoSync simulator started!")
-    print("Tracking 10 avocado containers...")
-    print("Generating 10 readings every second.")
-    print(f"Saving readings to: {OUTPUT_FILE}\n")
+    print("Tracking container: CNT-001")
+    print("Temperature and humidity: Random walk")
+    print("GPS: Simulated movement")
+    print("Generating one reading every second.")
+    print("Press Ctrl+C to stop.\n")
 
     try:
         while True:
-            for reading in generate_readings():
-                print(json.dumps(reading))
-
+            reading = generate_reading()
+            print(json.dumps(reading))
             time.sleep(1)
 
     except KeyboardInterrupt:
