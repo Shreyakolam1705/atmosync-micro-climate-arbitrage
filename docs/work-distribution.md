@@ -14,7 +14,7 @@
 | Amarnath | Snowflake + dbt + SQL Data Engineer | amarnath | Snowflake, dbt, analytical models |
 | Aditya | Apache Superset + BI Dashboard + Alerts Developer | Aditya | Dashboards, visualization, alerts |
 
-## Week 1 (10 to 16 Nov): Foundation
+## Week 1 (11 to 17 Nov): Foundation
 | Member | Tasks |
 |---|---|
 | Shreya | Repo, branches, folder structure, README, data schema, architecture document, PR reviews, merge to main |
@@ -22,7 +22,7 @@
 | Amarnath | Snowflake account, database ATMOSYNC, warehouse, RAW schema, raw readings table, roles, commodity prices table |
 | Aditya | Docker, Superset running locally, connect to Snowflake, user roles |
 
-## Week 2 (17 to 23 Nov): ELT and baseline dashboards
+## Week 2 (18 to 24 Nov): ELT and baseline dashboards
 | Member | Tasks |
 |---|---|
 | Shreya | Weekly report, bug tracking, test plan, end-to-end test, mentor update, Mid Review preparation |
@@ -30,7 +30,7 @@
 | Amarnath | dbt setup, sources, staging models for readings and prices, dbt tests |
 | Aditya | Baseline charts (temperature, humidity, container routes), Container Overview dashboard |
 
-## Weeks 3 and 4 (24 Nov to 10 Dec)
+## Weeks 3 and 4 (25 Nov to 8 Dec)
 To be added after the Mid Review. Week 3: spoilage arbitrage models and at-risk dashboard. Week 4: automation, query optimisation and Slack/email alerts.
 
 ## Working rules
@@ -44,3 +44,5 @@ To be added after the Mid Review. Week 3: spoilage arbitrage models and at-risk 
 |---|---|---|
 | 11 Nov 2026 | First version: roles and Weeks 1 and 2 | Shreya |
 | 11 Nov 2026 | Mid Review date updated to 27 to 30 Nov, Final Review date pending | Shreya |
+| 12 Nov 2026 | Week dates corrected to 11 to 17 Nov, 18 to 24 Nov, 25 Nov to 8 Dec | Shreya |
+| 12 Nov 2026 | Aditya is unwell and away for about a week; review on Mon 16 Nov, his Superset tasks may move to about 18 Nov | Shreya |
