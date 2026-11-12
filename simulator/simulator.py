@@ -37,7 +37,7 @@ def generate_reading():
     global temperature, humidity, latitude, longitude
 
     # Random-walk temperature and humidity
-    temperature += random.uniform(-0.01, 0.1)
+    temperature += random.uniform(-0.1, 0.1)
     humidity += random.uniform(-0.5, 0.5)
 
     # Keep sensor values within simulation limits
