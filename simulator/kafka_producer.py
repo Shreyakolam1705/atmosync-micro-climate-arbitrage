@@ -1,9 +1,8 @@
-
-import json
+﻿import json
 import time
 
 from kafka import KafkaProducer
-from simulator import generate_reading
+from simulator import generate_readings, INTERVAL_SECONDS
 
 TOPIC = "container-telemetry"
 
@@ -13,24 +12,21 @@ producer = KafkaProducer(
 )
 
 print("AtmoSync Kafka Producer started!")
-print(f"Sending CNT-001 readings to topic: {TOPIC}")
-print("Sending one reading every second. Press Ctrl+C to stop.\n")
+print(f"Sending 10 avocado container readings to topic: {TOPIC}")
+print("Press Ctrl+C to stop.\n")
 
 try:
     while True:
-        # Generate one reading from the shared simulator
-        reading = generate_reading()
+        readings = generate_readings()
 
-        # Send reading to Kafka
-        future = producer.send(TOPIC, value=reading)
-
-        # Wait for Kafka acknowledgement
-        future.get(timeout=10)
-
-        print("Sent to Kafka:", json.dumps(reading))
+        for reading in readings:
+            future = producer.send(TOPIC, value=reading)
+            future.get(timeout=10)
+            print("Sent to Kafka:", json.dumps(reading))
 
         producer.flush()
-        time.sleep(1)
+        print("-" * 60)
+        time.sleep(INTERVAL_SECONDS)
 
 except KeyboardInterrupt:
     print("\nKafka Producer stopped.")
