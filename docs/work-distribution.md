@@ -3,7 +3,7 @@
 - **Project:** AtmoSync: Micro-Climate Arbitrage Analytics
 - **Team Lead:** Shreya Kolam
 - **Project window:** 10 Nov 2026 to 10 Dec 2026
-- **Mid Review:** 27 to 30 Nov 2026 (as informed by mentor, to be confirmed)
+- **Mid Review:** 27 to 30 Nov 2026 (confirmed by mentor in writing on 12 Nov)
 - **Final Review:** Date to be confirmed
 
 ## Team and roles
@@ -11,7 +11,7 @@
 |---|---|---|---|
 | Shreya Kolam | Team Lead, Project Coordinator, Documentation, Integration | shreya | GitHub, documentation, PR reviews, reports, mentor communication |
 | Prakash Naik | Python IoT Simulator + Apache Kafka Developer | prakash | Simulator and Kafka streaming |
-| Amarnath | Snowflake + dbt + SQL Data Engineer | amarnath | Snowflake, dbt, analytical models |
+| Amarnath | Snowflake + dbt + SQL Data Engineer | amar | Snowflake, dbt, analytical models |
 | Aditya | Apache Superset + BI Dashboard + Alerts Developer | Aditya | Dashboards, visualization, alerts |
 
 ## Week 1 (11 to 17 Nov): Foundation
@@ -46,3 +46,4 @@ To be added after the Mid Review. Week 3: spoilage arbitrage models and at-risk 
 | 11 Nov 2026 | Mid Review date updated to 27 to 30 Nov, Final Review date pending | Shreya |
 | 12 Nov 2026 | Week dates corrected to 11 to 17 Nov, 18 to 24 Nov, 25 Nov to 8 Dec | Shreya |
 | 12 Nov 2026 | Aditya is unwell and away for about a week; review on Mon 16 Nov, his Superset tasks may move to about 18 Nov | Shreya |
+| 14 Nov 2026 | Mid Review dates confirmed in writing by mentor; Amarnath's branch name corrected to amar; Week 1 uses avocado only, more commodities in Week 3 | Shreya |
