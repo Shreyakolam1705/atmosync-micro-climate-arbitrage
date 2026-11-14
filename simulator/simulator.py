@@ -1,91 +1,184 @@
-
+﻿
+# Import required libraries
 from datetime import datetime, timezone
 import json
 import random
 import time
 from pathlib import Path
 
-# Save generated readings outside the sample-data folder
-OUTPUT_FILE = (
-    Path(__file__).resolve().parent.parent
-    / "data"
-    / "generated"
-    / "readings.jsonl"
-)
+# Get the folder where this Python file is located
+BASE_DIR = Path(__file__).resolve().parent
 
-# Create the output folder automatically if it doesn't exist
+# Configuration file path
+CONFIG_FILE = BASE_DIR / "config.json"
+
+# Output file path
+OUTPUT_FILE = BASE_DIR.parent / "data" / "generated" / "readings.jsonl"
+
+# Create output folder if it does not exist
 OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 
-# Generate 10 containers with starting temperatures
-containers = {
-    f"CNT-{i:03d}": random.uniform(5.0, 7.0)
-    for i in range(1, 11)
-}
 
-# Starting simulated GPS coordinates
-START_LATITUDE = 12.9716
-START_LONGITUDE = 77.5946
+def load_config():
+    """Load container details from config.json."""
 
-# Each container gets a slightly different starting position
-container_positions = {
-    container_id: {
-        "lat": START_LATITUDE + index * 0.0005,
-        "lon": START_LONGITUDE + index * 0.0005
+    with CONFIG_FILE.open("r", encoding="utf-8-sig") as file:
+        config = json.load(file)
+
+    return config
+
+
+# Load the configuration
+CONFIG = load_config()
+
+# Get interval and container information
+INTERVAL_SECONDS = CONFIG["interval_seconds"]
+CONTAINERS = CONFIG["containers"]
+
+
+def validate_config():
+    """Check whether the configuration is correct."""
+
+    # Check that exactly 10 containers are configured
+    if len(CONTAINERS) != 10:
+        raise ValueError("Config must contain exactly 10 containers.")
+
+    # Expected container IDs
+    expected_ids = [
+        f"CNT-{number:03d}"
+        for number in range(1, 11)
+    ]
+
+    # Actual container IDs
+    actual_ids = [
+        container["container_id"]
+        for container in CONTAINERS
+    ]
+
+    # Check container IDs and their order
+    if actual_ids != expected_ids:
+        raise ValueError("Container IDs must be CNT-001 to CNT-010 in order.")
+
+    # Check that all containers carry avocado
+    for container in CONTAINERS:
+        if container["commodity"] != "avocado":
+            raise ValueError("All containers must carry avocado.")
+
+        # Convert sensor values into numbers
+        container["temperature"] = float(container["temperature"])
+        container["humidity"] = float(container["humidity"])
+
+        # Check required location fields
+        if "lat" not in container or "lon" not in container:
+            raise ValueError("Every container must have lat and lon.")
+
+    # Check reading interval
+    if INTERVAL_SECONDS <= 0:
+        raise ValueError("interval_seconds must be greater than zero.")
+
+
+# Validate configuration before starting
+validate_config()
+
+
+def generate_reading(container, timestamp):
+    """Generate a new reading for one container."""
+
+    # Randomly change temperature slightly
+    container["temperature"] += random.uniform(-0.1, 0.1)
+
+    # Randomly change humidity slightly
+    container["humidity"] += random.uniform(-0.5, 0.5)
+
+    # Keep temperature within simulation limits
+    container["temperature"] = max(
+        4.0, min(12.0, container["temperature"])
+    )
+
+    # Keep humidity within simulation limits
+    container["humidity"] = max(
+        70.0, min(95.0, container["humidity"])
+    )
+
+    # Create reading using the shared data schema
+    reading = {
+        "container_id": container["container_id"],
+        "commodity": container["commodity"],
+        "timestamp": timestamp,
+        "temperature": round(container["temperature"], 2),
+        "humidity": round(container["humidity"], 2),
+        "vibration": round(random.uniform(0.1, 0.3), 2),
+        "lat": round(container["lat"], 6),
+        "lon": round(container["lon"], 6)
     }
-    for index, container_id in enumerate(containers)
-}
 
-# One container simulates a temperature problem
-faulty_container = "CNT-002"
+    # Simulate small location movement
+    container["lat"] += 0.0001
+    container["lon"] += 0.0001
 
-# Eastward movement per simulation cycle
-MOVEMENT_STEP = 0.0001
+    return reading
 
-print("AtmoSync simulator started!")
-print("Tracking 10 moving avocado containers...")
-print(f"Saving readings to: {OUTPUT_FILE}\n")
 
-try:
-    while True:
-        for container_id in containers:
+def generate_readings():
+    """Generate one reading for every container."""
 
-            # Simulate temperature changes
-            if container_id == faulty_container:
-                containers[container_id] += 0.15
-            else:
-                containers[container_id] += random.uniform(-0.2, 0.2)
+    readings = []
 
-            position = container_positions[container_id]
+    # Create one UTC timestamp for this batch
+    timestamp = (
+        datetime.now(timezone.utc)
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z")
+    )
 
-            # UTC timestamp
-            timestamp = (
-                datetime.now(timezone.utc)
-                .isoformat(timespec="seconds")
-                .replace("+00:00", "Z")
-            )
+    # Generate a reading for each container
+    for container in CONTAINERS:
+        reading = generate_reading(container, timestamp)
+        readings.append(reading)
 
-            # Generate sensor reading using the official schema
-            reading = {
-                "container_id": container_id,
-                "commodity": "avocado",
-                "timestamp": timestamp,
-                "temperature": round(containers[container_id], 2),
-                "humidity": round(random.uniform(80, 95), 2),
-                "vibration": round(random.uniform(0.1, 2.0), 2),
-                "lat": round(position["lat"], 6),
-                "lon": round(position["lon"], 6)
-            }
+    return readings
 
-            print(reading)
+def save_readings(readings):
+    """Append readings to readings.jsonl."""
+    with OUTPUT_FILE.open("a", encoding="utf-8") as file:
+        # Save each reading as a separate JSON line
+        for reading in readings:
+            file.write(json.dumps(reading) + "\n")
 
-            # Save reading to generated JSON Lines file
-            with OUTPUT_FILE.open("a", encoding="utf-8") as f:
-                f.write(json.dumps(reading) + "\n")
 
-            # Move container slightly east for next cycle
-            position["lon"] += MOVEMENT_STEP
+def print_readings(readings):
+    """Print all container readings."""
 
-        time.sleep(2)
+    for reading in readings:
+        print(json.dumps(reading))
 
-except KeyboardInterrupt:
-    print("\nAtmoSync simulator stopped.")
+    print("-" * 60)
+
+
+def main():
+    """Run the simulator continuously."""
+
+    print("AtmoSync simulator started!")
+    print("Tracking 10 avocado containers: CNT-001 to CNT-010")
+    print(f"Generating readings every {INTERVAL_SECONDS} second(s).")
+    print("Press Ctrl+C to stop.\n")
+
+    try:
+        while True:
+            # Generate readings for all containers
+            readings = generate_readings()
+
+            # Save readings to the output file
+            save_readings(readings)
+
+            # Print readings in the terminal
+            print_readings(readings)
+
+            # Wait before generating the next batch
+            time.sleep(INTERVAL_SECONDS)
+    except KeyboardInterrupt:
+        print("\nAtmoSync simulator stopped.")
+
+
+if __name__ == "__main__":
+    main()
