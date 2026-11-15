@@ -1,10 +1,11 @@
+
 # AtmoSync Simulator and Kafka
 
 **Owner:** Prakash
 
 This folder contains the Python IoT simulator and Kafka producer, consumer, and topic creation scripts.
 
-The simulator generates sensor readings for 10 avocado containers (`CNT-001` to `CNT-010`) and sends them to the Kafka topic `container-telemetry`.
+The simulator generates sensor readings for 10 avocado containers (CNT-001 to CNT-010) and sends them to the Kafka topic `container-telemetry`.
 
 ## Requirements
 
@@ -21,6 +22,12 @@ Activate the virtual environment:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks script activation, you can run Python directly using:
+
+```powershell
+.\.venv\Scripts\python.exe
 ```
 
 Install the required Python dependencies:
@@ -104,15 +111,58 @@ Press `Ctrl + C` to stop the simulator.
 
 ## 5. Run the Kafka Consumer
 
+Make sure Kafka is running and the `container-telemetry` topic exists.
+
 Open a new PowerShell terminal, navigate to the project root folder, and activate the virtual environment.
 
-Run:
+Run the consumer with default settings:
 
 ```powershell
 python .\simulator\kafka_consumer.py
 ```
 
-The consumer listens to the `container-telemetry` topic and displays received messages.
+Default settings:
+
+- **Topic:** `container-telemetry`
+- **Kafka server:** `127.0.0.1:9092`
+
+The consumer uses logging to display:
+
+- Consumer startup information.
+- Kafka connection details.
+- Each batch of messages received.
+- Individual sensor readings.
+- Errors and shutdown information.
+
+### Command-Line Options
+
+Specify a custom Kafka topic:
+
+```powershell
+python .\simulator\kafka_consumer.py --topic my-topic
+```
+
+Specify a custom Kafka server address:
+
+```powershell
+python .\simulator\kafka_consumer.py --bootstrap-servers localhost:9093
+```
+
+Specify both options:
+
+```powershell
+python .\simulator\kafka_consumer.py --topic my-topic --bootstrap-servers localhost:9093
+```
+
+Display all available command-line options:
+
+```powershell
+python .\simulator\kafka_consumer.py --help
+```
+
+If Kafka is unavailable or the requested topic does not exist, the consumer displays a clear error message and shuts down safely.
+
+Press `Ctrl + C` to stop the consumer.
 
 ## 6. Run the Kafka Producer
 
@@ -133,7 +183,7 @@ The producer:
 
 Check the consumer terminal to confirm that readings are received from all 10 containers.
 
-Press `Ctrl + C` to stop the producer and consumer.
+Press `Ctrl + C` to stop the producer.
 
 ## 7. Data Format
 
