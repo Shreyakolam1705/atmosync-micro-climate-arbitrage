@@ -1,11 +1,10 @@
-
 # AtmoSync Simulator and Kafka
 
 **Owner:** Prakash
 
-This folder contains the Python IoT simulator and Kafka producer, consumer, and topic creation scripts.
+This folder contains the Python IoT simulator, Kafka producer, Kafka consumer, and Kafka topic creation scripts.
 
-The simulator generates sensor readings for 10 avocado containers (CNT-001 to CNT-010) and sends them to the Kafka topic `container-telemetry`.
+The simulator generates sensor readings for 10 avocado containers (CNT-001 to CNT-010). The Kafka producer sends these readings to the `container-telemetry` topic, and the Kafka consumer receives and logs them.
 
 ## Requirements
 
@@ -24,10 +23,10 @@ Activate the virtual environment:
 .\.venv\Scripts\Activate.ps1
 ```
 
-If PowerShell blocks script activation, you can run Python directly using:
+If PowerShell blocks script activation, run Python directly using the virtual environment interpreter:
 
 ```powershell
-.\.venv\Scripts\python.exe
+.\.venv\Scripts\python.exe .\simulator\simulator.py
 ```
 
 Install the required Python dependencies:
@@ -52,7 +51,7 @@ Check whether Kafka is running:
 docker compose ps
 ```
 
-Kafka runs on:
+Kafka server address:
 
 `127.0.0.1:9092`
 
@@ -74,9 +73,100 @@ The script creates the topic if it does not exist and verifies that it exists.
 
 If the topic already exists, the script displays an appropriate message.
 
-## 4. Run the IoT Simulator
+## 4. Run the Kafka Producer
 
-Run the simulator:
+Open a PowerShell terminal in the project root folder with the virtual environment activated.
+
+Run:
+
+```powershell
+python .\simulator\kafka_producer.py
+```
+
+The producer:
+
+- Generates readings for all 10 avocado containers.
+- Sends readings to the `container-telemetry` Kafka topic.
+- Prints successfully sent messages.
+- Repeats according to the configured interval.
+
+The producer generates readings using the simulator module.
+
+Keep the producer running while testing the consumer.
+
+## 5. Run the Kafka Consumer
+
+Open a **second PowerShell terminal** in the project root folder.
+
+Activate the virtual environment in this terminal as well.
+
+Run the consumer with default settings:
+
+```powershell
+python .\simulator\kafka_consumer.py
+```
+
+Default settings:
+
+- **Topic:** `container-telemetry`
+- **Kafka server:** `127.0.0.1:9092`
+
+The consumer uses logging to display:
+
+- Consumer startup information.
+- Kafka connection details.
+- Each batch of messages received.
+- Individual sensor readings.
+- Errors and shutdown information.
+
+Check the consumer terminal to confirm that readings are received from all 10 containers:
+
+- CNT-001
+- CNT-002
+- CNT-003
+- CNT-004
+- CNT-005
+- CNT-006
+- CNT-007
+- CNT-008
+- CNT-009
+- CNT-010
+
+### Command-Line Options
+
+Specify a custom Kafka topic:
+
+```powershell
+python .\simulator\kafka_consumer.py --topic my-topic
+```
+
+Specify a custom Kafka server address:
+
+```powershell
+python .\simulator\kafka_consumer.py --bootstrap-servers localhost:9093
+```
+
+Specify both options:
+
+```powershell
+python .\simulator\kafka_consumer.py --topic my-topic --bootstrap-servers localhost:9093
+```
+
+Display all available command-line options:
+
+```powershell
+python .\simulator\kafka_consumer.py --help
+```
+
+If Kafka is unavailable or the requested topic does not exist, the consumer displays a clear error message and shuts down safely.
+
+Press `Ctrl + C` to stop the consumer.
+
+## 6. Run the IoT Simulator Separately
+
+The producer already generates readings using the simulator module.
+
+To run the simulator independently and generate a local JSONL data file, use:
 
 ```powershell
 python .\simulator\simulator.py
@@ -109,82 +199,6 @@ Generated readings are saved to:
 
 Press `Ctrl + C` to stop the simulator.
 
-## 5. Run the Kafka Consumer
-
-Make sure Kafka is running and the `container-telemetry` topic exists.
-
-Open a new PowerShell terminal, navigate to the project root folder, and activate the virtual environment.
-
-Run the consumer with default settings:
-
-```powershell
-python .\simulator\kafka_consumer.py
-```
-
-Default settings:
-
-- **Topic:** `container-telemetry`
-- **Kafka server:** `127.0.0.1:9092`
-
-The consumer uses logging to display:
-
-- Consumer startup information.
-- Kafka connection details.
-- Each batch of messages received.
-- Individual sensor readings.
-- Errors and shutdown information.
-
-### Command-Line Options
-
-Specify a custom Kafka topic:
-
-```powershell
-python .\simulator\kafka_consumer.py --topic my-topic
-```
-
-Specify a custom Kafka server address:
-
-```powershell
-python .\simulator\kafka_consumer.py --bootstrap-servers localhost:9093
-```
-
-Specify both options:
-
-```powershell
-python .\simulator\kafka_consumer.py --topic my-topic --bootstrap-servers localhost:9093
-```
-
-Display all available command-line options:
-
-```powershell
-python .\simulator\kafka_consumer.py --help
-```
-
-If Kafka is unavailable or the requested topic does not exist, the consumer displays a clear error message and shuts down safely.
-
-Press `Ctrl + C` to stop the consumer.
-
-## 6. Run the Kafka Producer
-
-Open another PowerShell terminal, navigate to the project root folder, and activate the virtual environment.
-
-Run:
-
-```powershell
-python .\simulator\kafka_producer.py
-```
-
-The producer:
-
-- Generates readings for all 10 containers.
-- Sends readings to the `container-telemetry` Kafka topic.
-- Prints successfully sent messages.
-- Repeats according to the configured interval.
-
-Check the consumer terminal to confirm that readings are received from all 10 containers.
-
-Press `Ctrl + C` to stop the producer.
-
 ## 7. Data Format
 
 All Kafka messages follow the shared data schema documented in:
@@ -208,7 +222,9 @@ All timestamps use UTC.
 
 **Note:** GPS coordinates are simulated values, not live GPS tracking.
 
-## 8. Stop Kafka
+## 8. Stop the Applications and Kafka
+
+Press `Ctrl + C` in the producer and consumer terminals to stop both applications.
 
 After completing the tests, stop the Kafka Docker container:
 

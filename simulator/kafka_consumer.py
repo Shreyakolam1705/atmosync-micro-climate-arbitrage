@@ -53,7 +53,6 @@ def main():
             enable_auto_commit=True,
             group_id="atmosync-test-consumer",
             request_timeout_ms=10000,
-            # api_version_auto_timeout_ms=10000
         )
 
         # Check whether the topic exists
