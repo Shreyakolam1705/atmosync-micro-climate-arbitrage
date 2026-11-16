@@ -5,7 +5,10 @@ AtmoSync watches the conditions inside shipping containers (temperature, humidit
 This repository is the Infotact Solutions internship project for the Data Analytics domain.
 
 ## How data flows
-Simulator -> Kafka -> Snowflake -> dbt -> Superset
+Python IoT simulator -> Kafka (topic: container-telemetry) -> Snowflake RAW table -> dbt (staging, spoilage and arbitrage models) -> Apache Superset dashboards and Slack/email alerts
+
+- Full architecture and owners: [docs/architecture.md](docs/architecture.md)
+- Shared data format (field names and units): [docs/data-schema.md](docs/data-schema.md)
 
 ## Team
 | Member | Role |
