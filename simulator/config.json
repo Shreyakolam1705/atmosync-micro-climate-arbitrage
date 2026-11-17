@@ -1,0 +1,15 @@
+{
+  "interval_seconds": 1,
+  "containers": [
+    {"container_id": "CNT-001", "commodity": "avocado", "temperature": 6.0, "humidity": 88.0, "lat": 12.9716, "lon": 77.5946},
+    {"container_id": "CNT-002", "commodity": "avocado", "temperature": 7.0, "humidity": 86.0, "lat": 12.9816, "lon": 77.6046},
+    {"container_id": "CNT-003", "commodity": "avocado", "temperature": 8.0, "humidity": 85.0, "lat": 12.9916, "lon": 77.6146},
+    {"container_id": "CNT-004", "commodity": "avocado", "temperature": 6.5, "humidity": 87.0, "lat": 13.0016, "lon": 77.6246},
+    {"container_id": "CNT-005", "commodity": "avocado", "temperature": 5.5, "humidity": 89.0, "lat": 13.0116, "lon": 77.6346},
+    {"container_id": "CNT-006", "commodity": "avocado", "temperature": 6.2, "humidity": 88.5, "lat": 13.0216, "lon": 77.6446},
+    {"container_id": "CNT-007", "commodity": "avocado", "temperature": 7.2, "humidity": 87.5, "lat": 13.0316, "lon": 77.6546},
+    {"container_id": "CNT-008", "commodity": "avocado", "temperature": 8.0, "humidity": 84.0, "lat": 13.0416, "lon": 77.6646},
+    {"container_id": "CNT-009", "commodity": "avocado", "temperature": 7.5, "humidity": 83.0, "lat": 13.0516, "lon": 77.6746},
+    {"container_id": "CNT-010", "commodity": "avocado", "temperature": 9.0, "humidity": 80.0, "lat": 13.0616, "lon": 77.6846}
+  ]
+}

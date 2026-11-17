@@ -219,7 +219,4 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-.env
-*.env
-profiles.yml
-secrets/
+data/generated/
