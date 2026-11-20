@@ -220,3 +220,11 @@ __marimo__/
 .streamlit/secrets.toml
 
 data/generated/
+
+# dbt generated files
+atmosync_dbt/target/
+atmosync_dbt/logs/
+atmosync_dbt/dbt_packages/
+
+# dbt personal credentials
+profiles.yml

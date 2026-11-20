@@ -1,0 +1,21 @@
+﻿version: 2
+
+sources:
+  - name: atmosync_raw
+    database: ATMOSYNC
+    schema: RAW
+
+    tables:
+      - name: raw_events
+        identifier: RAW_EVENTS
+        description: "Raw IoT telemetry events ingested from Kafka."
+
+        config:
+          loaded_at_field: INGESTED_AT
+          freshness:
+            warn_after:
+              count: 1
+              period: hour
+            error_after:
+              count: 24
+              period: hour

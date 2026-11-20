@@ -1,0 +1,13 @@
+﻿atmosync_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: YOUR_SNOWFLAKE_ACCOUNT
+      user: YOUR_SNOWFLAKE_USERNAME
+      password: YOUR_SNOWFLAKE_PASSWORD
+      role: ATMOSYNC_LOADER
+      database: ATMOSYNC
+      warehouse: ATMOSYNC_WH
+      schema: RAW
+      threads: 4
