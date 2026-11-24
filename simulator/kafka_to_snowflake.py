@@ -21,6 +21,8 @@ BOOTSTRAP_SERVERS = os.getenv(
     "localhost:9092"
 )
 
+BATCH_SIZE = 100
+
 consumer = None
 connection = None
 cursor = None
@@ -58,37 +60,58 @@ try:
 
     logging.info("Connected to Kafka.")
     logging.info("Listening for messages from topic: %s", TOPIC)
+    logging.info("Batch size: %d", BATCH_SIZE)
     logging.info("Press Ctrl+C to stop.")
 
     while True:
-        records = consumer.poll(timeout_ms=1000, max_records=100)
+        records = consumer.poll(
+            timeout_ms=1000,
+            max_records=BATCH_SIZE
+        )
 
-        for partition_records in records.values():
-            for message in partition_records:
-                payload = json.dumps(message.value)
+        # Collect messages from all Kafka partitions
+        messages = [
+            message
+            for partition_records in records.values()
+            for message in partition_records
+        ]
 
-                cursor.execute(
-                    """
-                    INSERT INTO RAW_EVENTS (RAW_PAYLOAD)
-                    SELECT PARSE_JSON(%s)
-                    """,
-                    (payload,)
-                )
+        if not messages:
+            continue
 
-        # Commit Snowflake first, then Kafka offsets.
-        if records:
-            connection.commit()
-            consumer.commit()
+        logging.info(
+            "Received %d messages from Kafka. Inserting into Snowflake...",
+            len(messages)
+        )
 
-            message_count = sum(
-                len(partition_records)
-                for partition_records in records.values()
-            )
+        # Convert messages into JSON strings
+        payloads = [
+            json.dumps(message.value)
+            for message in messages
+        ]
 
-            logging.info(
-                "Successfully inserted %d messages into Snowflake.",
-                message_count
-            )
+        # Build one INSERT statement for the entire batch
+        placeholders = ", ".join(
+            ["(%s)"] * len(payloads)
+        )
+
+        insert_query = f"""
+            INSERT INTO RAW_EVENTS (RAW_PAYLOAD)
+            SELECT PARSE_JSON(column1)
+            FROM VALUES {placeholders}
+        """
+
+        # Insert the complete batch using one SQL request
+        cursor.execute(insert_query, tuple(payloads))
+
+        # Commit Snowflake first, then Kafka offsets
+        connection.commit()
+        consumer.commit()
+
+        logging.info(
+            "Successfully inserted %d messages into Snowflake.",
+            len(messages)
+        )
 
 except KeyboardInterrupt:
     logging.info("Loader stopped by user.")
