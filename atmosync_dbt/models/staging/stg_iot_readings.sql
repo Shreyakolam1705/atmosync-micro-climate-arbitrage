@@ -1,3 +1,4 @@
+
 WITH source_data AS (
 
     SELECT
@@ -11,7 +12,9 @@ renamed AS (
     SELECT
         RAW_PAYLOAD:container_id::VARCHAR AS container_id,
         RAW_PAYLOAD:commodity::VARCHAR AS commodity,
-        RAW_PAYLOAD:timestamp::TIMESTAMP_NTZ AS reading_timestamp,
+        TRY_TO_TIMESTAMP_NTZ(
+            RAW_PAYLOAD:timestamp::VARCHAR
+        ) AS reading_timestamp,
         RAW_PAYLOAD:temperature::FLOAT AS temperature,
         RAW_PAYLOAD:humidity::FLOAT AS humidity,
         RAW_PAYLOAD:vibration::FLOAT AS vibration,
@@ -23,4 +26,11 @@ renamed AS (
 
 )
 
-SELECT * FROM renamed
+SELECT *
+FROM renamed
+WHERE
+    container_id IS NOT NULL
+    AND commodity IS NOT NULL
+    AND reading_timestamp IS NOT NULL
+    AND temperature IS NOT NULL
+    AND humidity IS NOT NULL

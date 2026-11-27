@@ -1,0 +1,46 @@
+
+version: 2
+
+models:
+  - name: stg_iot_readings
+    description: "Cleaned and structured IoT container sensor readings"
+    columns:
+      - name: container_id
+        description: "Unique container identifier"
+        data_tests:
+          - not_null
+
+      - name: commodity
+        data_tests:
+          - not_null
+
+      - name: reading_timestamp
+        data_tests:
+          - not_null
+
+      - name: temperature
+        data_tests:
+          - not_null
+
+      - name: humidity
+        data_tests:
+          - not_null
+
+  - name: stg_commodity_prices
+    description: "Cleaned and structured commodity pricing records"
+    columns:
+      - name: commodity
+        data_tests:
+          - not_null
+
+      - name: price_timestamp
+        data_tests:
+          - not_null
+
+      - name: origin_price
+        data_tests:
+          - not_null
+
+      - name: secondary_market_price
+        data_tests:
+          - not_null
