@@ -1,0 +1,13 @@
+services:
+  superset:
+    image: atmosync-superset:latest
+    container_name: atmosync-superset
+    ports:
+      - "8088:8088"
+    environment:
+      SUPERSET_SECRET_KEY: "change-this-local-key"
+    volumes:
+      - superset_home:/app/superset_home
+
+volumes:
+  superset_home:
