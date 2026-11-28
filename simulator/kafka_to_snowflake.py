@@ -10,6 +10,28 @@ from kafka import KafkaConsumer
 # Load environment variables from the project root .env file
 load_dotenv()
 
+# Check required environment variables
+REQUIRED_ENV_VARS = [
+    "SNOWFLAKE_ACCOUNT",
+    "SNOWFLAKE_USER",
+    "SNOWFLAKE_PASSWORD",
+    "SNOWFLAKE_ROLE",
+    "SNOWFLAKE_WAREHOUSE",
+    "SNOWFLAKE_DATABASE",
+    "SNOWFLAKE_SCHEMA",
+]
+
+missing_vars = [
+    name for name in REQUIRED_ENV_VARS
+    if not os.getenv(name)
+]
+
+if missing_vars:
+    raise EnvironmentError(
+        "Missing required environment variables: "
+        + ", ".join(missing_vars)
+    )
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
